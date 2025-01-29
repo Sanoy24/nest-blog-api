@@ -16,6 +16,7 @@ import { MongooseConnectionService } from './config/mongodb-connection.service';
         connection.on('error', (error: any) => {
           console.log('MongoDB connection error:', error);
         });
+        connection._events.connected();
         return connection;
       },
     }),
