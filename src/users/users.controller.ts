@@ -7,11 +7,15 @@ import {
   Post,
   SerializeOptions,
   UseInterceptors,
+  UseGuards,
+  Request,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDTO } from './dtos/create-user.dto';
 import { UserResponseDTO } from './entities/user.entity';
-import { plainToInstance } from 'class-transformer';
+import { plainToClass, plainToInstance } from 'class-transformer';
+import { AuthGuard } from 'src/Guard/auth.guard';
+import { User } from './schema/user.schema';
 
 @Controller('users')
 export class UsersController {
@@ -30,8 +34,10 @@ export class UsersController {
       excludeExtraneousValues: true,
     });
   }
+  @UseGuards(AuthGuard)
   @Get('/getusers')
-  async getUsers() {
-    return await this.usersService.findAll();
+  async getUsers(): Promise<User[]> {
+    const user = await this.usersService.findAll();
+    return plainToInstance(UserResponseDTO, user);
   }
 }

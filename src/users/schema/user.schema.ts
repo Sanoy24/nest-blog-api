@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument } from 'mongoose';
+import { Document, HydratedDocument } from 'mongoose';
 import { hashSync } from 'bcrypt';
 export type UserDocument = HydratedDocument<User>;
 
@@ -11,7 +11,10 @@ export class User {
   lastName: string;
   @Prop({ required: true })
   email: string;
-  @Prop({ required: true, set: (password: string) => hashSync(password, 10) })
+  @Prop({
+    required: true,
+    set: (password: string) => hashSync(password, 10),
+  })
   password: string;
 }
 

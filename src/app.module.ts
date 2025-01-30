@@ -5,6 +5,7 @@ import { UsersModule } from './users/users.module';
 import { MongooseModule } from '@nestjs/mongoose';
 import { MongooseConnectionService } from './config/mongodb-connection.service';
 import { Connection } from 'mongoose';
+import { AuthenticationModule } from './authentication/authentication.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { Connection } from 'mongoose';
       },
     }),
     UsersModule,
+    AuthenticationModule,
   ],
   controllers: [AppController],
   providers: [AppService, MongooseConnectionService],
