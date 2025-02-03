@@ -15,22 +15,29 @@ export class AuthenticationService {
   async signIn(
     email: string,
     pass: string,
-  ): Promise<{ access_token: string; user: User }> {
+  ): Promise<{ access_token: string; user: UserResponseDTO }> {
     const user: UserDocument | null = await this.usersService.findOne(email);
+
     if (!user) {
       throw new UnauthorizedException('Invalid credentials');
     }
-    console.log(pass, user.password);
-    if (user && !bcrypt.compareSync(pass, user.password)) {
+
+    if (!(await user.comparePassword(pass))) {
       throw new UnauthorizedException('Invalid credentials');
     }
-    console.log('[ - user -]', user);
-    // TODO : Generate Jwt and return it here
-    // instead of returning user object
+
+    // Exclude sensitive fields and transform the user object to DTO
+    const userDto = plainToInstance(UserResponseDTO, user.toJSON(), {
+      excludeExtraneousValues: true, // Ensures only DTO fields are included
+    });
+
+    // Generate JWT token
     const payload = { sub: user._id, username: user.email };
+    const accessToken = await this.jwtService.signAsync(payload);
+
     return {
-      access_token: await this.jwtService.signAsync(payload),
-      user: plainToInstance(UserResponseDTO, user),
+      access_token: accessToken,
+      user: userDto,
     };
   }
 }

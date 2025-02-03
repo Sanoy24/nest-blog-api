@@ -19,6 +19,6 @@ export class UsersService {
     return this.userModel.find().lean().exec();
   }
   async findOne(email: string): Promise<UserDocument | null> {
-    return await this.userModel.findOne({ email }).lean().exec();
+    return await this.userModel.findOne({ email }).select('+password').exec();
   }
 }

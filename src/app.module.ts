@@ -11,17 +11,26 @@ import { PostModule } from './post/post.module';
 import { CommentModule } from './comment/comment.module';
 import { LikeModule } from './like/like.module';
 import { TagModule } from './tag/tag.module';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 
 @Module({
   imports: [
-    MongooseModule.forRoot('mongodb://localhost:27017', {
-      dbName: 'NestJs-Blog',
-      onConnectionCreate: (connection: Connection) => {
-        connection.on('connected', () => Logger.log('MongoDB connected'));
-        connection.on('disconnected', () => Logger.log('disconnected'));
-        connection.on('reconnected', () => Logger.log('reconnected'));
-        return connection;
-      },
+    ConfigModule.forRoot({
+      envFilePath: '.env',
+      isGlobal: true,
+    }),
+    MongooseModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: async (configService: ConfigService) => ({
+        uri: configService.get<string>('MONGO_URI'),
+        onConnectionCreate: (connection: Connection) => {
+          connection.on('connected', () => Logger.log('MongoDB connected'));
+          connection.on('disconnected', () => Logger.log('disconnected'));
+          connection.on('reconnected', () => Logger.log('reconnected'));
+          return connection;
+        },
+      }),
     }),
     UsersModule,
     AuthenticationModule,

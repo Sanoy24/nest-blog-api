@@ -2,7 +2,9 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
 import { NextFunction } from 'express';
 import * as bcrypt from 'bcrypt';
-export type UserDocument = HydratedDocument<User>;
+export type UserDocument = HydratedDocument<User> & {
+  comparePassword(candidatePassword: string): Promise<boolean>;
+};
 
 export enum UserRole {
   USER = 'user',
@@ -25,11 +27,6 @@ export class User {
 
   @Prop({ type: String, enum: UserRole, default: UserRole.USER })
   role: string;
-
-  async comparePassword(candidatePassword: string): Promise<boolean> {
-    if (!this.password) return false;
-    return bcrypt.compare(candidatePassword, this.password);
-  }
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
@@ -42,3 +39,11 @@ UserSchema.pre('save', function (next: NextFunction) {
   user.password = hashedPassword;
   next();
 });
+
+UserSchema.methods.comparePassword = async function (
+  candidatePassword: string,
+): Promise<boolean> {
+  const user = this as UserDocument;
+  if (!user.password) return false;
+  return await bcrypt.compare(candidatePassword, user.password);
+};

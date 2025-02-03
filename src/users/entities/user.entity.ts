@@ -2,6 +2,9 @@ import { Exclude, Expose } from 'class-transformer';
 
 export class UserResponseDTO {
   @Expose()
+  _id: string;
+
+  @Expose()
   firstName: string;
 
   @Expose()
@@ -11,14 +14,7 @@ export class UserResponseDTO {
   email: string;
 
   @Expose()
-  _id: string;
-
-  @Expose()
-  createdAt: Date;
-
-  @Expose()
-  updatedAt: Date;
-
+  role: string;
   @Exclude()
-  password: string; // Exclude the password field
+  password: string;
 }

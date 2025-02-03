@@ -8,7 +8,7 @@ export class AuthenticationController {
   @HttpCode(HttpStatus.OK)
   @Post('login')
   async signIn(@Body() signInDto: Record<string, any>) {
-    console.log(signInDto);
+    // console.log(signInDto);
     return this.authsService.signIn(signInDto.email, signInDto.password);
   }
 }
