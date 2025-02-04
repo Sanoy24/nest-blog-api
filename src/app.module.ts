@@ -12,6 +12,7 @@ import { CommentModule } from './comment/comment.module';
 import { LikeModule } from './like/like.module';
 import { TagModule } from './tag/tag.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { HealthModule } from './health/health.module';
 
 @Module({
   imports: [
@@ -39,6 +40,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
     CommentModule,
     LikeModule,
     TagModule,
+    HealthModule,
   ],
   controllers: [AppController],
   providers: [AppService, MongooseConnectionService],

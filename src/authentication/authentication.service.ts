@@ -5,6 +5,8 @@ import { plainToInstance } from 'class-transformer';
 import { UserResponseDTO } from 'src/users/entities/user.entity';
 import { JwtService } from '@nestjs/jwt';
 import { User, UserDocument } from 'src/users/schema/user.schema';
+import { stringify } from 'querystring';
+import { report } from 'process';
 
 @Injectable()
 export class AuthenticationService {
@@ -12,10 +14,7 @@ export class AuthenticationService {
     private readonly usersService: UsersService,
     private readonly jwtService: JwtService,
   ) {}
-  async signIn(
-    email: string,
-    pass: string,
-  ): Promise<{ access_token: string; user: UserResponseDTO }> {
+  async signIn(email: string, pass: string): Promise<{ access_token: string }> {
     const user: UserDocument | null = await this.usersService.findOne(email);
 
     if (!user) {
@@ -31,13 +30,22 @@ export class AuthenticationService {
       excludeExtraneousValues: true, // Ensures only DTO fields are included
     });
 
+    return this.signToken(userDto._id, userDto.email);
     // Generate JWT token
-    const payload = { sub: user._id, username: user.email };
-    const accessToken = await this.jwtService.signAsync(payload);
 
-    return {
-      access_token: accessToken,
-      user: userDto,
-    };
+    // const accessToken = await this.jwtService.signAsync(payload);
+
+    // return {
+    //   access_token: accessToken,
+    //   user: userDto,
+    // };
+  }
+  async signToken(
+    userId: string,
+    email: string,
+  ): Promise<{ access_token: string }> {
+    const payload = { sub: userId, username: email };
+    const accessToken = await this.jwtService.signAsync(payload);
+    return { access_token: accessToken };
   }
 }
