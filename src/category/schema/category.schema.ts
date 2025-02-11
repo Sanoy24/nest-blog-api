@@ -8,14 +8,7 @@ export type CategoryDocument = HydratedDocument<Category>;
 export class Category {
   @Prop({ required: true, type: String, unique: true, trim: true })
   name: string;
-  @Prop({
-    required: true,
-    type: String,
-    unique: true,
-    lowercase: true,
-    trim: true,
-  })
-  slug: string;
+
   @Prop({ type: String, trim: true })
   description: string;
 }

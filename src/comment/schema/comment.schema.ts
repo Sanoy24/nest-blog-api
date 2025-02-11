@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import mongoose, { HydratedDocument } from 'mongoose';
-import { Post } from 'src/post/schema/post.schema';
+import mongoose, { HydratedDocument, Types } from 'mongoose';
+import { Post } from 'src/post/dal/post.schema';
 import { User } from 'src/users/schema/user.schema';
 
 export type CommentDocument = HydratedDocument<Comment>;
@@ -14,5 +14,5 @@ export class Comment {
   post: Post;
   @Prop({ type: mongoose.Schema.Types.ObjectId, default: Date.now })
   parentComment: Comment;
-  likes: [User];
+  likes: Types.ObjectId;
 }
