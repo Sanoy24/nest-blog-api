@@ -1,6 +1,6 @@
 import { Body, Injectable, Param } from '@nestjs/common';
 import { PostRepository } from './dal/posts.repository';
-import { ObjectId, Types } from 'mongoose';
+import { FilterQuery, ObjectId, Types, UpdateQuery } from 'mongoose';
 import { Post, PostDocument } from './dal/post.schema';
 import { CreatePostDTO } from './dtos/create-post.dto';
 import { generateSlug } from 'src/shared/utils/generate.slug';
@@ -52,6 +52,19 @@ export class PostService {
    * ```
    */
   async createPost(createPostDto: CreatePostDTO) {
+    let slug = generateSlug(createPostDto.title);
+    let counter = 1;
+    while (true) {
+      const existingPost = await this.postRepository.findPostBySlug({ slug });
+
+      if (!existingPost) {
+        createPostDto.slug = slug;
+        break;
+      }
+
+      slug = generateSlug(createPostDto.title) + `-${counter}`;
+      counter++;
+    }
     if (!createPostDto.slug) {
       createPostDto.slug = generateSlug(createPostDto.title);
     }
@@ -124,7 +137,10 @@ export class PostService {
    * @param updateData - The data to update the post with.
    * @returns A promise resolving to the updated post or null if not found.
    */
-  async updatePost(query: object, updateData: object): Promise<Post | null> {
+  async updatePost(
+    query: FilterQuery<Post | null>,
+    updateData: UpdateQuery<PostDocument>,
+  ): Promise<Post | null> {
     return await this.postRepository.updatePost(query, updateData);
   }
 

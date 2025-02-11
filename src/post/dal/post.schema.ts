@@ -23,7 +23,7 @@ export class Post {
   tags: string[];
   @Prop({ type: Date, default: Date.now() })
   publishedAt?: Date;
-  @Prop({ type: String, required: true })
+  @Prop({ type: String, required: true, unique: true })
   slug: string;
 }
 
