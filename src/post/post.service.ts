@@ -52,21 +52,15 @@ export class PostService {
    * ```
    */
   async createPost(createPostDto: CreatePostDTO) {
-    let slug = generateSlug(createPostDto.title);
-    let counter = 1;
-    while (true) {
-      const existingPost = await this.postRepository.findPostBySlug({ slug });
+    let slug = createPostDto.slug
+      ? createPostDto.slug
+      : generateSlug(createPostDto.title);
+    const existingPost = await this.postRepository.findPostBySlug({ slug });
 
-      if (!existingPost) {
-        createPostDto.slug = slug;
-        break;
-      }
-
-      slug = generateSlug(createPostDto.title) + `-${counter}`;
-      counter++;
-    }
-    if (!createPostDto.slug) {
-      createPostDto.slug = generateSlug(createPostDto.title);
+    if (!existingPost) {
+      createPostDto.slug = slug;
+    } else {
+      createPostDto.slug = slug + `-${Date.now().toString(36)}`;
     }
     if (!createPostDto.excerpt) {
       createPostDto.excerpt = generateExcerpt(createPostDto.content);
