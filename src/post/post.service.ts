@@ -1,6 +1,6 @@
-import { Body, Injectable, Param } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { PostRepository } from './dal/posts.repository';
-import { FilterQuery, ObjectId, Types, UpdateQuery } from 'mongoose';
+import { FilterQuery, UpdateQuery } from 'mongoose';
 import { Post, PostDocument } from './dal/post.schema';
 import { CreatePostDTO } from './dtos/create-post.dto';
 import { generateSlug } from 'src/shared/utils/generate.slug';
@@ -52,7 +52,7 @@ export class PostService {
    * ```
    */
   async createPost(createPostDto: CreatePostDTO) {
-    let slug = createPostDto.slug
+    const slug = createPostDto.slug
       ? createPostDto.slug
       : generateSlug(createPostDto.title);
     const existingPost = await this.postRepository.findPostBySlug({ slug });

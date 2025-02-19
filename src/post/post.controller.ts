@@ -10,6 +10,7 @@ import {
   Logger,
   NotFoundException,
   Param,
+  Patch,
   Post,
   Query,
 } from '@nestjs/common';
@@ -22,7 +23,7 @@ export class PostController {
   constructor(private postService: PostService) {}
   private readonly logger = new Logger(PostController.name); // Create a logger instance
 
-  @Post('/create-post')
+  @Post()
   async createPost(@Body() createPostDto: CreatePostDTO) {
     try {
       const post = await this.postService.createPost(createPostDto);
@@ -42,7 +43,7 @@ export class PostController {
     }
   }
 
-  @Get('getsinglepost/:slug')
+  @Get(':slug')
   async getPostBySlug(@Param('slug') slug: string) {
     const post = await this.postService.getPostBySlug(slug);
     if (!post) {
@@ -51,7 +52,7 @@ export class PostController {
     return post;
   }
 
-  @Get('/paginatedposts')
+  @Get()
   async getAllPosts(
     @Query('page') page?: string,
     @Query('limit') limit?: string,
@@ -66,13 +67,20 @@ export class PostController {
         parsedLimit,
       );
       return posts;
-    } catch (error) {
-      console.log('--------------', error);
-      throw new Error(error);
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        this.logger.error(
+          `Error fetching posts: ${error.message}`,
+          error.stack,
+        );
+      } else {
+        this.logger.error('Error fetching posts', error);
+      }
+      throw new InternalServerErrorException('An unexpected error occurred.');
     }
   }
 
-  @Post('/updateblog/:id')
+  @Patch(':id')
   async updatePost(
     @Param('id') id: string,
     @Body() updateData: Partial<CreatePostDTO>,
