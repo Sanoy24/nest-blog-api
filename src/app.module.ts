@@ -13,6 +13,8 @@ import { LikeModule } from './like/like.module';
 import { TagModule } from './tag/tag.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { HealthModule } from './health/health.module';
+import { APP_GUARD } from '@nestjs/core';
+import { JwtAuthGuard } from './Guard/jwt-auth.guard';
 
 @Module({
   imports: [
@@ -43,6 +45,13 @@ import { HealthModule } from './health/health.module';
     HealthModule,
   ],
   controllers: [AppController],
-  providers: [AppService, MongooseConnectionService],
+  providers: [
+    AppService,
+    MongooseConnectionService,
+    {
+      provide: APP_GUARD,
+      useClass: JwtAuthGuard,
+    },
+  ],
 })
 export class AppModule {}
