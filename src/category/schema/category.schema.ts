@@ -1,6 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
-import { CategoryModule } from '../category.module';
 
 export type CategoryDocument = HydratedDocument<Category>;
 
@@ -10,7 +9,7 @@ export class Category {
   name: string;
 
   @Prop({ type: String, trim: true })
-  description: string;
+  description?: string;
 }
 
 export const CategorySchema = SchemaFactory.createForClass(Category);
