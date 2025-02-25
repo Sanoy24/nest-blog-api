@@ -5,7 +5,9 @@ import {
   HealthCheck,
   MongooseHealthIndicator,
 } from '@nestjs/terminus';
+import { Public } from 'src/shared/utils/publicRoute';
 
+@Public()
 @Controller('health')
 export class HealthController {
   constructor(
