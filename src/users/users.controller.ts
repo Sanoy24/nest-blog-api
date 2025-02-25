@@ -1,13 +1,9 @@
 import {
   Body,
-  ClassSerializerInterceptor,
   ConflictException,
   Controller,
   Get,
   Post,
-  SerializeOptions,
-  UseInterceptors,
-  UseGuards,
   ServiceUnavailableException,
   // Request,
   Req,
@@ -15,18 +11,16 @@ import {
 import { UsersService } from './users.service';
 import { CreateUserDTO } from './dtos/create-user.dto';
 import { UserResponseDTO } from './entities/user.entity';
-import { plainToClass, plainToInstance } from 'class-transformer';
-// import { AuthGuard } from 'src/Guard/auth.guard';
 import { User } from './schema/user.schema';
-import { JsonWebTokenError } from '@nestjs/jwt';
-import { AuthGuard } from '@nestjs/passport';
-import { JwtAuthGuard } from 'src/Guard/jwt-auth.guard';
 import { Request } from 'express';
+import { plainToInstance } from 'class-transformer';
+import { Public } from 'src/shared/utils/publicRoute';
 
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
+  @Public()
   @Post('/signup')
   async signup(@Body() user: CreateUserDTO) {
     try {
@@ -44,7 +38,6 @@ export class UsersController {
       throw new ServiceUnavailableException();
     }
   }
-  @UseGuards(JwtAuthGuard)
   @Get('/getusers')
   async getUsers(@Req() req: Request): Promise<User[] | null> {
     try {
@@ -52,12 +45,8 @@ export class UsersController {
       console.log(req.user);
       const user = await this.usersService.findAll();
       return plainToInstance(UserResponseDTO, user);
-    } catch (error) {
-      if (error instanceof JsonWebTokenError) {
-        throw new JsonWebTokenError('token expired', error);
-      } else {
-        throw new Error('please try again');
-      }
+    } catch {
+      throw new Error('please try again');
     }
   }
 }

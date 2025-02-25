@@ -15,6 +15,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { HealthModule } from './health/health.module';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from './Guard/jwt-auth.guard';
+import { ThrottlerModule } from '@nestjs/throttler';
 
 @Module({
   imports: [
@@ -34,6 +35,9 @@ import { JwtAuthGuard } from './Guard/jwt-auth.guard';
           return connection;
         },
       }),
+    }),
+    ThrottlerModule.forRoot({
+      throttlers: [{ ttl: 6000, limit: 10 }],
     }),
     UsersModule,
     AuthenticationModule,

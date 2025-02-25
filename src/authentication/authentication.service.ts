@@ -16,12 +16,15 @@ export class AuthenticationService {
   ) {}
   async signIn(email: string, pass: string): Promise<{ access_token: string }> {
     const user: UserDocument | null = await this.usersService.findOne(email);
+    console.log(email, pass);
 
     if (!user) {
+      console.log('this is the error _____');
       throw new UnauthorizedException('Invalid credentials');
     }
 
     if (!(await user.comparePassword(pass))) {
+      console.log('_ this is the response');
       throw new UnauthorizedException('Invalid credentials');
     }
 
