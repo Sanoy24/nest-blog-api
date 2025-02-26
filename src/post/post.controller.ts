@@ -19,14 +19,7 @@ import {
 import { PostService } from './post.service';
 import { CreatePostDTO } from './dtos/create-post.dto';
 import { MongooseError, Types } from 'mongoose';
-import * as cloudinary from 'cloudinary';
 import { FileInterceptor } from '@nestjs/platform-express';
-
-cloudinary.v2.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
-});
 
 @Controller('post')
 export class PostController {
@@ -40,16 +33,6 @@ export class PostController {
     @UploadedFile() file: Express.Multer.File,
   ) {
     try {
-      let imageUrl: string | null = null;
-      if (file) {
-        const uploadResult = await cloudinary.v2.uploader.upload(file.path, {
-          folder: 'posts',
-        });
-        imageUrl = uploadResult.secure_url;
-      }
-      if (imageUrl) {
-        createPostDto.featuredImage = imageUrl;
-      }
       const post = await this.postService.createPost(createPostDto);
       return post;
     } catch (error) {

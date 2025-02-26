@@ -16,6 +16,7 @@ import { HealthModule } from './health/health.module';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from './Guard/jwt-auth.guard';
 import { ThrottlerModule } from '@nestjs/throttler';
+import { UploadModule } from './upload/upload.module';
 
 @Module({
   imports: [
@@ -47,6 +48,7 @@ import { ThrottlerModule } from '@nestjs/throttler';
     LikeModule,
     TagModule,
     HealthModule,
+    UploadModule,
   ],
   controllers: [AppController],
   providers: [
