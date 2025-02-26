@@ -6,7 +6,6 @@ import {
   MongooseHealthIndicator,
 } from '@nestjs/terminus';
 import { Public } from 'src/shared/utils/publicRoute';
-
 @Public()
 @Controller('health')
 export class HealthController {
@@ -20,7 +19,7 @@ export class HealthController {
   @HealthCheck()
   check() {
     return this.health.check([
-      () => this.http.pingCheck('nest-js', 'http://localhost:3000/'),
+      () => this.http.pingCheck('nest-js', 'http://localhost:3001/'),
       () => this.database.pingCheck('database'),
     ]);
   }

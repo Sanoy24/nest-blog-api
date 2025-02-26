@@ -21,7 +21,7 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
     ]);
 
     if (isPublic) {
-      console.log('__ route is public');
+      // console.log('__ route is public');
       return true;
     }
     return super.canActivate(context);
