@@ -26,6 +26,7 @@ export class CreatePostDTO {
   excerpt: string;
 
   @IsString()
+  @IsOptional()
   featuredImage: string;
 
   @IsMongoId() // Author should be a valid MongoDB ObjectId
