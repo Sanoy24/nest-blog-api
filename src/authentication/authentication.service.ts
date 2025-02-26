@@ -14,7 +14,10 @@ export class AuthenticationService {
     private readonly usersService: UsersService,
     private readonly jwtService: JwtService,
   ) {}
-  async signIn(email: string, pass: string): Promise<{ access_token: string }> {
+  async signIn(
+    email: string,
+    pass: string,
+  ): Promise<{ access_token: string | null; user: Partial<User> }> {
     const user: UserDocument | null = await this.usersService.findOne(email);
     console.log(email, pass);
 
@@ -33,22 +36,19 @@ export class AuthenticationService {
       excludeExtraneousValues: true, // Ensures only DTO fields are included
     });
 
-    return this.signToken(userDto._id, userDto.email);
+    const token = await this.signToken(userDto._id, userDto.email);
     // Generate JWT token
 
     // const accessToken = await this.jwtService.signAsync(payload);
 
-    // return {
-    //   access_token: accessToken,
-    //   user: userDto,
-    // };
+    return {
+      access_token: token,
+      user: userDto,
+    };
   }
-  async signToken(
-    userId: string,
-    email: string,
-  ): Promise<{ access_token: string }> {
+  async signToken(userId: string, email: string): Promise<string | null> {
     const payload = { sub: userId, username: email };
     const accessToken = await this.jwtService.signAsync(payload);
-    return { access_token: accessToken };
+    return accessToken;
   }
 }
