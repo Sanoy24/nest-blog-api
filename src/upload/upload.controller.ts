@@ -6,9 +6,7 @@ import {
 } from '@nestjs/common';
 import { UploadService } from './upload.service';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { Public } from 'src/shared/utils/publicRoute';
 
-@Public()
 @Controller('upload')
 export class UploadController {
   constructor(private readonly uploadService: UploadService) {}
