@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+  blog-api:
+    build: .
+    ports:
+      - '3001:3001'
+    depends_on:
+      - mongo
+    env_file:
+      - .env
+    restart: always
+  mongo:
+    image: mongo:8.0
+    container_name: mongo_db
+    ports:
+      - '27017:27017'
+    volumes:
+      - mongo-data:/data/db
+    restart: always
+volumes:
+  mongo-data:
