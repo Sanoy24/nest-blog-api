@@ -1,8 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { User, UserDocument } from './schema/user.schema';
-import { Model } from 'mongoose';
+import { FilterQuery, Model, PopulateOptions, ProjectionType } from 'mongoose';
 import { CreateUserDTO } from './dtos/create-user.dto';
+import { sendMail } from '../shared/lib/sendVerificationMail';
+import { verificationToken } from 'src/shared/lib/generateVerificationToken';
 
 @Injectable()
 export class UsersService {
@@ -20,5 +22,31 @@ export class UsersService {
   }
   async findOne(email: string): Promise<UserDocument | null> {
     return await this.userModel.findOne({ email }).select('+password').exec();
+  }
+
+  async updateUser(
+    query: FilterQuery<UserDocument>,
+    updateData: Partial<UserDocument>,
+  ): Promise<UserDocument | null> {
+    return await this.userModel
+      .findOneAndUpdate(query, updateData, { new: true })
+      .lean()
+      .exec();
+  }
+
+  async findUserByToken(
+    query: FilterQuery<UserDocument> = {},
+    projection?: Partial<ProjectionType<UserDocument>>,
+    populate?: PopulateOptions | PopulateOptions[],
+  ): Promise<UserDocument | null> {
+    let queryBuilder = this.userModel.findOne(query, projection);
+    if (populate) {
+      queryBuilder = queryBuilder.populate(populate);
+    }
+    return await queryBuilder.lean().exec();
+  }
+
+  async sendVerificationMail(to: string) {
+    return await sendMail(to, verificationToken);
   }
 }

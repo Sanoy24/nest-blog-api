@@ -29,6 +29,7 @@ export class UsersController {
         throw new ConflictException('User already exists');
       }
       const createdUser = await this.usersService.create(user);
+      await this.usersService.sendVerificationMail(user.email);
 
       // Serialize the response to exclude the password field
       return plainToInstance(UserResponseDTO, createdUser, {

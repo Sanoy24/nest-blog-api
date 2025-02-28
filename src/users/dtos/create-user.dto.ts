@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEmail, IsNotEmpty, IsString } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsString, Matches } from 'class-validator';
 
 export class CreateUserDTO {
   @IsString()
@@ -12,11 +12,17 @@ export class CreateUserDTO {
   @IsNotEmpty()
   lastName: string;
   @ApiProperty()
-  @IsEmail()
   @IsString()
+  @IsEmail({}, { message: 'Invalid email format' })
+  @Matches(/^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/, {
+    message: 'Invalid email format',
+  })
   email: string;
   @ApiProperty()
   @IsString()
   @IsNotEmpty()
   password: string;
+
+  @IsString()
+  verificationToken: string;
 }

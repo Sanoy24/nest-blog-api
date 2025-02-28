@@ -17,4 +17,10 @@ export class UserResponseDTO {
   role: string;
   @Exclude()
   password: string;
+
+  @Expose()
+  verificationToken: string | null;
+
+  @Expose()
+  isEmailVerified: boolean;
 }
