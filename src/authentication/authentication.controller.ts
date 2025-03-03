@@ -38,7 +38,13 @@ export class AuthenticationController {
     if (!user) {
       throw new BadRequestException('Invalid or expired token');
     }
-
+    if (
+      user.verificationToken &&
+      user?.verificationExpires &&
+      user?.verificationExpires < new Date()
+    ) {
+      throw new BadRequestException('token exprired request new token');
+    }
     await this.usersService.updateUser(
       { _id: user._id },
       {
