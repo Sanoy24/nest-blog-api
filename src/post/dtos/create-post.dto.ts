@@ -34,4 +34,9 @@ export class CreatePostDTO {
 
   @IsArray()
   categories: Types.ObjectId[];
+
+  @IsOptional()
+  htmlContent: string;
+  @IsOptional()
+  format: string;
 }

@@ -1,9 +1,12 @@
 import mongoose, { HydratedDocument, Types } from 'mongoose';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { User } from 'src/users/schema/user.schema';
-import { Category } from 'src/category/schema/category.schema';
 
 export type PostDocument = HydratedDocument<Post>;
+enum Format {
+  Markdown = 'markdown',
+  Html = 'html',
+  Text = 'text',
+}
 
 @Schema({ timestamps: true, versionKey: false })
 export class Post {
@@ -25,6 +28,12 @@ export class Post {
   publishedAt?: Date;
   @Prop({ type: String, required: true, unique: true })
   slug: string;
+
+  @Prop({ type: String })
+  htmlContent?: string;
+
+  @Prop({ type: String, enum: Format, default: Format.Text })
+  format: Format;
 }
 
 export const PostSchema = SchemaFactory.createForClass(Post);

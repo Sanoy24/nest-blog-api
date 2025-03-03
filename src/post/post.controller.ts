@@ -20,6 +20,7 @@ import { PostService } from './post.service';
 import { CreatePostDTO } from './dtos/create-post.dto';
 import { MongooseError, Types } from 'mongoose';
 import { FileInterceptor } from '@nestjs/platform-express';
+import * as marked from 'marked';
 
 @Controller('post')
 export class PostController {
@@ -33,6 +34,11 @@ export class PostController {
     @UploadedFile() file: Express.Multer.File,
   ) {
     try {
+      // if(createPostDto)
+      if (createPostDto.format == 'markdown') {
+        const parsedContent = await marked.parse(createPostDto.content);
+        createPostDto.htmlContent = parsedContent;
+      }
       const post = await this.postService.createPost(createPostDto);
       return post;
     } catch (error) {
