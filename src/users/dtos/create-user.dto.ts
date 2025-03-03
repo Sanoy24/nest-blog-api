@@ -22,7 +22,4 @@ export class CreateUserDTO {
   @IsString()
   @IsNotEmpty()
   password: string;
-
-  @IsString()
-  verificationToken: string;
 }

@@ -15,6 +15,8 @@ import { User } from './schema/user.schema';
 import { Request } from 'express';
 import { plainToInstance } from 'class-transformer';
 import { Public } from 'src/shared/utils/publicRoute';
+import { verificationToken } from 'src/shared/lib/generateVerificationToken';
+import * as crypto from 'node:crypto';
 
 @Controller('users')
 export class UsersController {
@@ -22,20 +24,33 @@ export class UsersController {
 
   @Public()
   @Post('/signup')
-  async signup(@Body() user: CreateUserDTO) {
+  async signup(@Body() user: User) {
     try {
       const userExists = await this.usersService.findOne(user.email);
       if (userExists) {
         throw new ConflictException('User already exists');
       }
+      const verificationToken: string = crypto.randomBytes(32).toString('hex');
+
+      const verificationTokenExpires = new Date(
+        Date.now() + 24 * 60 * 60 * 1000,
+      );
+      user.verificationToken = verificationToken;
+      user.verificationExpires = verificationTokenExpires;
+
+      console.log(user);
+
       const createdUser = await this.usersService.create(user);
-      await this.usersService.sendVerificationMail(user.email);
+      await this.usersService.sendVerificationMail(
+        user.email,
+        verificationToken,
+      );
 
       // Serialize the response to exclude the password field
       return plainToInstance(UserResponseDTO, createdUser, {
         excludeExtraneousValues: true,
       });
-    } catch (error) {
+    } catch (error: any) {
       throw new ServiceUnavailableException();
     }
   }
@@ -43,7 +58,7 @@ export class UsersController {
   async getUsers(@Req() req: Request): Promise<User[] | null> {
     try {
       // console.log({ user: req?.user });
-      console.log(req.user);
+      console.log('__current user', req.user);
       const user = await this.usersService.findAll();
       return plainToInstance(UserResponseDTO, user);
     } catch {

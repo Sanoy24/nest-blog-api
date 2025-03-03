@@ -7,10 +7,13 @@ import {
   Query,
   Get,
   BadRequestException,
+  NotFoundException,
 } from '@nestjs/common';
 import { AuthenticationService } from './authentication.service';
 import { Public } from 'src/shared/utils/publicRoute';
 import { UsersService } from 'src/users/users.service';
+import * as crypto from 'node:crypto';
+import { sendMail } from 'src/shared/lib/sendVerificationMail';
 
 @Controller('auth')
 export class AuthenticationController {
@@ -44,5 +47,27 @@ export class AuthenticationController {
       },
     );
     return { success: true, message: 'Email Verified Successfully' };
+  }
+
+  @Post('resend-email')
+  async resendVerificationEmail(@Body() email: string) {
+    const user = await this.usersService.findOne(email);
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    if (user.isEmailVerified) {
+      throw new BadRequestException('email already verified');
+    }
+
+    const verificationToken = crypto.randomBytes(32).toString('hex');
+    const verificationExpires = new Date(Date.now() + 24 * 60 * 60 * 1000);
+
+    await this.usersService.updateUser(
+      { _id: user._id },
+      { verificationToken, verificationExpires },
+    );
+
+    await this.usersService.sendVerificationMail(email, verificationToken);
+    return { success: true, message: 'New verification email sent' };
   }
 }

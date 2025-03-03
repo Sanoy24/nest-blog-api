@@ -1,4 +1,4 @@
-import nodemailer from 'nodemailer';
+import * as nodemailer from 'nodemailer';
 import { type SentMessageInfo } from 'nodemailer/lib/smtp-transport';
 
 export async function sendMail(to: string, token: string): Promise<string> {
@@ -13,7 +13,7 @@ export async function sendMail(to: string, token: string): Promise<string> {
     });
 
     // 2️⃣ Construct email content
-    const verificationLink = `${process.env.FRONTEND_URL}/verify-email?token=${token}`;
+    const verificationLink = `localhost:3001/auth/verify-email?token=${token}`;
     const mailOptions = {
       from: process.env.MAIL_FROM || '"No Reply" <no-reply@example.com>',
       to,
@@ -21,10 +21,7 @@ export async function sendMail(to: string, token: string): Promise<string> {
       html: `
         <h2>Email Verification</h2>
         <p>Click the link below to verify your email:</p>
-        <a href="${verificationLink}" target="_blank" 
-          style="background-color:#4CAF50;color:white;padding:10px 20px;text-decoration:none;border-radius:5px;">
-          Verify Email
-        </a>
+        <button> <a href="${verificationLink}">Visit W3Schools.com!</a> </button
         <p>If you did not request this, please ignore this email.</p>
       `,
     };
@@ -33,6 +30,7 @@ export async function sendMail(to: string, token: string): Promise<string> {
     const info: SentMessageInfo = await transporter.sendMail(mailOptions);
     return info.response;
   } catch (error) {
+    console.log(process.env.MAIL_USER, process.env.MAIL_PASS);
     console.error('❌ Error sending email:', error);
     throw new Error('Email sending failed');
   }

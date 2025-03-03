@@ -23,4 +23,7 @@ export class UserResponseDTO {
 
   @Expose()
   isEmailVerified: boolean;
+
+  @Expose()
+  verificationExpires: Date;
 }

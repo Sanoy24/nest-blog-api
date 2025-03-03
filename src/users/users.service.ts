@@ -4,7 +4,8 @@ import { User, UserDocument } from './schema/user.schema';
 import { FilterQuery, Model, PopulateOptions, ProjectionType } from 'mongoose';
 import { CreateUserDTO } from './dtos/create-user.dto';
 import { sendMail } from '../shared/lib/sendVerificationMail';
-import { verificationToken } from 'src/shared/lib/generateVerificationToken';
+// import { verificationToken } from 'src/shared/lib/generateVerificationToken';
+import * as crypto from 'node:crypto';
 
 @Injectable()
 export class UsersService {
@@ -46,7 +47,7 @@ export class UsersService {
     return await queryBuilder.lean().exec();
   }
 
-  async sendVerificationMail(to: string) {
-    return await sendMail(to, verificationToken);
+  async sendVerificationMail(to: string, token: string) {
+    return await sendMail(to, token);
   }
 }
