@@ -6,6 +6,7 @@ import {
   IsString,
 } from 'class-validator';
 import { Types } from 'mongoose';
+import { Format } from '../dal/post.schema';
 
 export class CreatePostDTO {
   @IsString()
@@ -38,5 +39,5 @@ export class CreatePostDTO {
   @IsOptional()
   htmlContent: string;
   @IsOptional()
-  format: string;
+  format: Format;
 }

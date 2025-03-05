@@ -4,27 +4,26 @@ import {
   Controller,
   Get,
   Post,
-  ServiceUnavailableException,
-  // Request,
-  Req,
+  HttpException,
+  HttpStatus,
+  Logger,
+  InternalServerErrorException,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { CreateUserDTO } from './dtos/create-user.dto';
 import { UserResponseDTO } from './entities/user.entity';
 import { User } from './schema/user.schema';
-import { Request } from 'express';
 import { plainToInstance } from 'class-transformer';
 import { Public } from 'src/shared/utils/publicRoute';
-import { verificationToken } from 'src/shared/lib/generateVerificationToken';
 import * as crypto from 'node:crypto';
 
 @Controller('users')
 export class UsersController {
+  private readonly logger = new Logger(UsersController.name);
   constructor(private readonly usersService: UsersService) {}
 
   @Public()
   @Post('/signup')
-  async signup(@Body() user: User) {
+  async signup(@Body() user: User): Promise<UserResponseDTO> {
     try {
       const userExists = await this.usersService.findOne(user.email);
       if (userExists) {
@@ -50,19 +49,31 @@ export class UsersController {
       return plainToInstance(UserResponseDTO, createdUser, {
         excludeExtraneousValues: true,
       });
-    } catch (error: any) {
-      throw new ServiceUnavailableException();
+    } catch (error) {
+      if (error instanceof Error) {
+        this.logger.error(`Sign up failed:${error.message}`, error.stack);
+      }
+      if (error instanceof ConflictException) {
+        throw error;
+      }
+      throw new InternalServerErrorException('Signup faild, please try again.');
     }
   }
   @Get('/getusers')
-  async getUsers(@Req() req: Request): Promise<User[] | null> {
+  async getUsers(): Promise<User[] | null> {
     try {
-      // console.log({ user: req?.user });
-      console.log('__current user', req.user);
       const user = await this.usersService.findAll();
+      if (!user || user.length === 0) {
+        throw new HttpException('No users found', HttpStatus.NOT_FOUND);
+      }
       return plainToInstance(UserResponseDTO, user);
-    } catch {
-      throw new Error('please try again');
+    } catch (error) {
+      if (error instanceof Error) {
+        this.logger.error(`Get users failed:${error.message}`, error.stack);
+      }
+      throw new InternalServerErrorException(
+        'Something went wrong please try again',
+      );
     }
   }
 }

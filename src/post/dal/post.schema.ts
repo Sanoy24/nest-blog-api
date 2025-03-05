@@ -2,7 +2,7 @@ import mongoose, { HydratedDocument, Types } from 'mongoose';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 
 export type PostDocument = HydratedDocument<Post>;
-enum Format {
+export enum Format {
   Markdown = 'markdown',
   Html = 'html',
   Text = 'text',
